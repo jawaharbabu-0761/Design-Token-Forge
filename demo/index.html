@@ -103,6 +103,9 @@ html[data-theme="dark"] .global-save-bar{box-shadow:0 -4px 16px rgba(0,0,0,.3)}
 .map-edit-toggle{margin-left:auto;padding:5px 14px;border:1px solid var(--demo-border);border-radius:var(--radius-sm,4px);background:transparent;color:var(--demo-fg-subtle);font-size:var(--font-size-11,11px);font-weight:600;cursor:pointer;font-family:inherit;transition:all 120ms;white-space:nowrap;align-self:center}
 .map-edit-toggle:hover{border-color:var(--primary-component-bg-default);color:var(--primary-content-default)}
 .map-edit-toggle[aria-pressed="true"]{background:var(--primary-component-bg-default);color:#fff;border-color:var(--primary-component-bg-default)}
+.map-cancel-btn{padding:5px 14px;border:1px solid var(--demo-border);border-radius:var(--radius-sm,4px);background:transparent;color:var(--demo-fg-subtle);font-size:var(--font-size-11,11px);font-weight:600;cursor:pointer;font-family:inherit;transition:all 120ms;white-space:nowrap;align-self:center}
+.map-cancel-btn:hover{border-color:#991B1B;color:#991B1B;background:#FEF2F2}
+.map-revert-btn{align-self:center}
 
 /* ── Step Picker Button (replaces bare <select>) ──────────── */
 .step-pick{display:inline-flex;align-items:center;gap:6px;padding:3px 8px 3px 4px;border:1px solid var(--demo-border);border-radius:4px;background:var(--demo-surface);cursor:pointer;font-size:9px;font-family:var(--font-family-mono,monospace);color:var(--demo-fg);min-width:100px;position:relative;transition:border-color 120ms}
@@ -385,7 +388,8 @@ body.auth-locked .global-save-bar{filter:blur(6px);pointer-events:none;user-sele
     <h2>2. T1 &mdash; Semantic Token Map</h2>
     <span class="section-tag">18 Tokens &times; Light/Dark</span>
     <button class="map-edit-toggle" id="mapEditToggle" type="button">Edit Mappings</button>
-    <button class="section-reset" id="resetMapBtn" type="button" title="Reset T1 maps to defaults"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>Reset Maps</button>
+    <button class="map-cancel-btn" id="mapCancelBtn" type="button" style="display:none">Cancel</button>
+    <button class="section-reset map-revert-btn" id="revertMapBtn" type="button" title="Revert to last deployed mappings" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>Revert to Deployed</button>
   </div>
   <p class="section-desc">Each primitive step is assigned a semantic purpose. Select a role to see how its 22-step palette maps to 18 semantic tokens for both light and dark themes. Toggle <strong>Edit Mappings</strong> to customize step assignments.</p>
   <div style="padding:8px 0 0 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -405,7 +409,8 @@ body.auth-locked .global-save-bar{filter:blur(6px);pointer-events:none;user-sele
     <h2>2b. T2 &mdash; Surface Context Map</h2>
     <span class="section-tag">9 Surfaces &times; 16 Props</span>
     <button class="map-edit-toggle" id="surfEditToggle" type="button">Edit Surface Map</button>
-    <button class="section-reset" id="surfResetBtn" type="button" title="Reset surface maps to defaults"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>Reset Surfaces</button>
+    <button class="map-cancel-btn" id="surfCancelBtn" type="button" style="display:none">Cancel</button>
+    <button class="section-reset map-revert-btn" id="surfRevertBtn" type="button" title="Revert surface maps to last deployed" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>Revert to Deployed</button>
   </div>
   <p class="section-desc">Each surface resolves its step names against a palette source. Select a surface to view and edit its step assignments &mdash; use the palette source dropdown to switch which role palette feeds the surface.</p>
   <div style="padding:8px 0 0 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -1375,15 +1380,69 @@ stepRoleSelect.addEventListener('change', function() {
 // ══════════════════════════════════════════════════════════════
 var mapGrid = document.getElementById('mapGrid');
 var mapEditToggle = document.getElementById('mapEditToggle');
+var mapCancelBtn = document.getElementById('mapCancelBtn');
+var revertMapBtn = document.getElementById('revertMapBtn');
 var mapEditMode = false;
+var _mapSnapshotLight = null;
+var _mapSnapshotDark = null;
 
 var STEP_OPTIONS = PE.STEP_NAMES.slice(); // ['white','25','50',...,'black']
 
-mapEditToggle.addEventListener('click', function() {
-  mapEditMode = !mapEditMode;
-  mapEditToggle.setAttribute('aria-pressed', mapEditMode ? 'true' : 'false');
-  mapEditToggle.textContent = mapEditMode ? 'Done Editing' : 'Edit Mappings';
+function enterMapEditMode() {
+  // Snapshot current state so Cancel can restore it
+  _mapSnapshotLight = JSON.parse(JSON.stringify(LIGHT_MAP));
+  _mapSnapshotDark = JSON.parse(JSON.stringify(DARK_MAP));
+  mapEditMode = true;
+  mapEditToggle.setAttribute('aria-pressed', 'true');
+  mapEditToggle.textContent = 'Done';
+  mapCancelBtn.style.display = '';
+  revertMapBtn.style.display = '';
   renderMap();
+}
+function exitMapEditMode() {
+  mapEditMode = false;
+  _mapSnapshotLight = null;
+  _mapSnapshotDark = null;
+  mapEditToggle.setAttribute('aria-pressed', 'false');
+  mapEditToggle.textContent = 'Edit Mappings';
+  mapCancelBtn.style.display = 'none';
+  revertMapBtn.style.display = 'none';
+  renderMap();
+}
+
+mapEditToggle.addEventListener('click', function() {
+  if (!mapEditMode) {
+    enterMapEditMode();
+  } else {
+    // "Done" — keep changes, exit edit mode
+    exitMapEditMode();
+    injectAllTokens();
+    showSaveMsg('Mappings updated');
+  }
+});
+
+// Cancel — discard edits made during this session
+mapCancelBtn.addEventListener('click', function() {
+  if (_mapSnapshotLight) LIGHT_MAP = JSON.parse(JSON.stringify(_mapSnapshotLight));
+  if (_mapSnapshotDark) DARK_MAP = JSON.parse(JSON.stringify(_mapSnapshotDark));
+  exitMapEditMode();
+  injectAllTokens();
+  showSaveMsg('Edits discarded');
+});
+
+// Revert to Deployed — restore from projectConfig (last pushed state)
+revertMapBtn.addEventListener('click', function() {
+  if (!confirm('Revert mappings to the last deployed version?')) return;
+  if (projectConfig && projectConfig.semanticMap) {
+    if (projectConfig.semanticMap.light) LIGHT_MAP = normalizeSemanticMap(JSON.parse(JSON.stringify(projectConfig.semanticMap.light)));
+    if (projectConfig.semanticMap.dark) DARK_MAP = normalizeSemanticMap(JSON.parse(JSON.stringify(projectConfig.semanticMap.dark)));
+  } else {
+    // No deployed state exists — fall back to factory defaults
+    resetMaps();
+  }
+  injectAllTokens();
+  renderMap();
+  showSaveMsg('Reverted to last deployed mappings');
 });
 
 // Close any open step dropdown when clicking outside
@@ -1577,9 +1636,12 @@ var SURF_DA = JSON.parse(JSON.stringify(DEFAULT_SURF_DA));
 var surfTabs = document.getElementById('surfTabs');
 var surfBody = document.getElementById('surfBody');
 var surfEditToggle = document.getElementById('surfEditToggle');
+var surfCancelBtn = document.getElementById('surfCancelBtn');
+var surfRevertBtn = document.getElementById('surfRevertBtn');
 var surfEditMode = false;
 var selectedSurface = 'base';
 var surfSrcBar = document.getElementById('surfSrcBar');
+var _surfSnapshot = null;
 
 // ── Per-surface palette source map ──────────────────────────
 // Default: all non-accent surfaces use 'greyscale', accent uses 'primary'
@@ -1627,10 +1689,67 @@ function renderSurfTabs() {
 }
 
 surfEditToggle.addEventListener('click', function() {
-  surfEditMode = !surfEditMode;
-  surfEditToggle.setAttribute('aria-pressed', surfEditMode ? 'true' : 'false');
-  surfEditToggle.textContent = surfEditMode ? 'Done Editing' : 'Edit Surface Map';
+  if (!surfEditMode) {
+    // Enter edit mode — snapshot state
+    _surfSnapshot = { L: JSON.parse(JSON.stringify(SURF_L)), D: JSON.parse(JSON.stringify(SURF_D)), LA: JSON.parse(JSON.stringify(SURF_LA)), DA: JSON.parse(JSON.stringify(SURF_DA)), SRC: JSON.parse(JSON.stringify(SURF_PALETTE_SRC)) };
+    surfEditMode = true;
+    surfEditToggle.setAttribute('aria-pressed', 'true');
+    surfEditToggle.textContent = 'Done';
+    surfCancelBtn.style.display = '';
+    surfRevertBtn.style.display = '';
+  } else {
+    // Done — keep changes, exit edit mode
+    surfEditMode = false;
+    _surfSnapshot = null;
+    surfEditToggle.setAttribute('aria-pressed', 'false');
+    surfEditToggle.textContent = 'Edit Surface Map';
+    surfCancelBtn.style.display = 'none';
+    surfRevertBtn.style.display = 'none';
+    injectSurfaceTokens();
+    showSaveMsg('Surface mappings updated');
+  }
   renderSurfTable();
+});
+
+surfCancelBtn.addEventListener('click', function() {
+  if (_surfSnapshot) {
+    SURF_L = _surfSnapshot.L;
+    SURF_D = _surfSnapshot.D;
+    SURF_LA = _surfSnapshot.LA;
+    SURF_DA = _surfSnapshot.DA;
+    SURF_PALETTE_SRC = _surfSnapshot.SRC;
+  }
+  surfEditMode = false;
+  _surfSnapshot = null;
+  surfEditToggle.setAttribute('aria-pressed', 'false');
+  surfEditToggle.textContent = 'Edit Surface Map';
+  surfCancelBtn.style.display = 'none';
+  surfRevertBtn.style.display = 'none';
+  injectSurfaceTokens();
+  renderSurfTable();
+  renderSurfSrcBar();
+  showSaveMsg('Surface edits discarded');
+});
+
+surfRevertBtn.addEventListener('click', function() {
+  if (!confirm('Revert surface mappings to the last deployed version?')) return;
+  if (projectConfig && projectConfig.surfaceMap) {
+    if (projectConfig.surfaceMap.light) { SURF_L = JSON.parse(JSON.stringify(DEFAULT_SURF_L)); Object.keys(projectConfig.surfaceMap.light).forEach(function(s) { if (SURF_L[s]) Object.assign(SURF_L[s], projectConfig.surfaceMap.light[s]); }); }
+    if (projectConfig.surfaceMap.dark) { SURF_D = JSON.parse(JSON.stringify(DEFAULT_SURF_D)); Object.keys(projectConfig.surfaceMap.dark).forEach(function(s) { if (SURF_D[s]) Object.assign(SURF_D[s], projectConfig.surfaceMap.dark[s]); }); }
+    if (projectConfig.surfaceMap.lightAccent) SURF_LA = JSON.parse(JSON.stringify(projectConfig.surfaceMap.lightAccent));
+    if (projectConfig.surfaceMap.darkAccent) SURF_DA = JSON.parse(JSON.stringify(projectConfig.surfaceMap.darkAccent));
+    if (projectConfig.surfacePaletteSrc) SURF_PALETTE_SRC = JSON.parse(JSON.stringify(projectConfig.surfacePaletteSrc));
+  } else {
+    SURF_L = JSON.parse(JSON.stringify(DEFAULT_SURF_L));
+    SURF_D = JSON.parse(JSON.stringify(DEFAULT_SURF_D));
+    SURF_LA = JSON.parse(JSON.stringify(DEFAULT_SURF_LA));
+    SURF_DA = JSON.parse(JSON.stringify(DEFAULT_SURF_DA));
+    SURF_PALETTE_SRC = JSON.parse(JSON.stringify(DEFAULT_SURF_SRC));
+  }
+  renderSurfTable();
+  renderSurfSrcBar();
+  injectSurfaceTokens();
+  showSaveMsg('Reverted to last deployed surface maps');
 });
 
 // Get hex for a step name using the palette assigned to a surface
@@ -1770,18 +1889,7 @@ function renderSurfTable() {
   }
 }
 
-document.getElementById('surfResetBtn').addEventListener('click', function() {
-  // Reset surface maps to hardcoded defaults
-  SURF_L = JSON.parse(JSON.stringify(DEFAULT_SURF_L));
-  SURF_D = JSON.parse(JSON.stringify(DEFAULT_SURF_D));
-  SURF_LA = JSON.parse(JSON.stringify(DEFAULT_SURF_LA));
-  SURF_DA = JSON.parse(JSON.stringify(DEFAULT_SURF_DA));
-  SURF_PALETTE_SRC = JSON.parse(JSON.stringify(DEFAULT_SURF_SRC));
-  renderSurfTable();
-  renderSurfSrcBar();
-  injectSurfaceTokens();
-  showSaveMsg('T2 surface maps and palette sources reset to defaults');
-});
+// (Surface reset button removed — replaced by Revert to Deployed in edit mode)
 
 renderSurfTabs();
 renderSurfTable();
@@ -2165,13 +2273,7 @@ document.getElementById('resetRolesBtn').addEventListener('click', function() {
   showSaveMsg('Color roles reset to defaults');
 });
 
-// Reset T1 Maps (Section 2) — revert semantic maps
-document.getElementById('resetMapBtn').addEventListener('click', function() {
-  resetMaps();
-  injectAllTokens();
-  renderMap();
-  showSaveMsg('T1 semantic maps reset to defaults');
-});
+// (Reset Maps button removed — replaced by Revert to Deployed in edit mode)
 
 // ══════════════════════════════════════════════════════════════
 // DEPLOY TO FIGMA (GitHub Commit)
