@@ -5,7 +5,7 @@
   "description": "Design tokens for Kanaa",
   "created": "2026-05-13",
   "paletteKeys": {
-    "monochromatic": "#336CB0",
+    "monochromatic": "#336bc0",
     "danger": "#DC2626",
     "warning": "#D97706",
     "info": "#0EA5E9",
