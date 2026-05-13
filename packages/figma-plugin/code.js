@@ -1002,14 +1002,14 @@ async function generateComponentFromBlueprint(blueprint) {
   /* ── Step 3: Find or create DTF Components page ────────── */
   var page = null;
   for (var pi = 0; pi < figma.root.children.length; pi++) {
-    if (figma.root.children[pi].name === 'DTF Components') {
+    if (figma.root.children[pi].name === 'Components') {
       page = figma.root.children[pi];
       break;
     }
   }
   if (!page) {
     page = figma.createPage();
-    page.name = 'DTF Components';
+    page.name = 'Components';
   }
   await figma.setCurrentPageAsync(page);
 
@@ -1017,7 +1017,7 @@ async function generateComponentFromBlueprint(blueprint) {
   for (var ci2 = page.children.length - 1; ci2 >= 0; ci2--) {
     var child = page.children[ci2];
     /* Remove DTF sections (contain all presentation) */
-    if ((child.type === 'SECTION' || child.type === 'FRAME') && child.name.indexOf('DTF /') === 0) {
+    if ((child.type === 'SECTION' || child.type === 'FRAME') && (child.name.indexOf('DTF /') === 0 || child.name.indexOf(BP.name) === 0)) {
       child.remove();
       log('Removed existing section: ' + child.name);
       continue;
@@ -1319,7 +1319,7 @@ async function generateComponentFromBlueprint(blueprint) {
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      PRESENTATION: Page Header — Hero Card (absolute positioning)
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  var headerSec = createSection('DTF / ' + BP.name + ' — Overview', SECTION_W);
+  var headerSec = createSection(BP.name + ' — Overview', SECTION_W);
 
   /* Hero — plain frame, NO auto-layout. All children positioned manually. */
   var HERO_PAD = 40;
@@ -1478,7 +1478,7 @@ async function generateComponentFromBlueprint(blueprint) {
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      PRESENTATION: Icon Primitive (absolute positioning)
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-  var iconSec = createSection('DTF / Icon Primitive', 480);
+  var iconSec = createSection('Icon Primitive', 480);
 
   /* Card background */
   var iconCard = figma.createFrame();
@@ -1540,7 +1540,7 @@ async function generateComponentFromBlueprint(blueprint) {
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
   figma.ui.postMessage({ type: 'gen-progress', text: 'Building master components…' });
 
-  var masterSec = createSection('DTF / Tier 1 — Masters', SECTION_W);
+  var masterSec = createSection('Tier 1 — Masters', SECTION_W);
 
   /* Header bar — plain frame with absolute text */
   var mHeaderBar = figma.createFrame();
@@ -1598,7 +1598,7 @@ async function generateComponentFromBlueprint(blueprint) {
 
     /* Create master component */
     var master = figma.createComponent();
-    master.name = masterName;
+    master.name = 'mc/' + masterName;
     master.description = BP.description || '';
     master.resize(120, 32);
     master.layoutMode = 'HORIZONTAL';
@@ -1837,7 +1837,7 @@ async function generateComponentFromBlueprint(blueprint) {
 
   var allComponentSets = [];
 
-  var variantSec = createSection('DTF / Tier 2 — Variants', SECTION_W);
+  var variantSec = createSection('Tier 2 — Variants', SECTION_W);
 
   /* Header bar — plain frame, absolute children */
   var vHeaderBar = figma.createFrame();
