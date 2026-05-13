@@ -730,50 +730,122 @@ var BUTTON_BLUEPRINT = {
   /* Default content color applied in master (T2 Surface Context) */
   masterContentColor: 'default/content/default',
 
-  /* Variant axes */
-  types:  ['Filled', 'Outlined', 'Ghost', 'Fill & Outline'],
-  states: ['Default', 'Hover', 'Pressed', 'Selected', 'Focus', 'Disabled'],
+  /* ── Families ──────────────────────────────────────────────
+     Each family produces its own component set per master.
+     - Neutral: structural variants on T2 surface context (theme-aware greys).
+     - Brand:   semantic variants on T3 status context, locked to 'brand' mode
+                (uses the project's brand palette via T3 → T1 alias chain).
 
-  /* Color overrides per Type × State applied on the INSTANCE inside each variant.
-     String values = T2 Surface Context path.
-     { t3: path } = T3 Status Context path.
-     text/icon overrides only needed when differing from master default.        */
-  stateOverrides: {
-    'Filled': {
-      'Default':          { fill: 'default/component/bg' },
-      'Hover':            { fill: 'default/component/bg-hover' },
-      'Pressed':          { fill: 'default/component/bg-pressed' },
-      'Selected':         { fill: { t3: 'container/bg' }, stroke: { t3: 'component/outline-default' }, strokeWeight: 1,
-                            text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
-      'Focus':            { fill: 'default/component/bg', stroke: { t3: 'component/outline-default' }, strokeWeight: 2 },
-      'Disabled':         { fill: 'default/component/bg', componentOpacity: 0.3 }
+     stateOverrides format:
+       String values  = T2 Surface Context path.
+       { t3: path }   = T3 Status Context path (resolved in family.t3Mode).
+     ─────────────────────────────────────────────────────────── */
+  families: {
+    'Neutral': {
+      types:  ['Filled', 'Outlined', 'Ghost', 'Fill & Outline'],
+      states: ['Default', 'Hover', 'Pressed', 'Selected', 'Focus', 'Disabled'],
+      stateOverrides: {
+        'Filled': {
+          'Default':  { fill: 'default/component/bg-default' },
+          'Hover':    { fill: 'default/component/bg-hover' },
+          'Pressed':  { fill: 'default/component/bg-pressed' },
+          'Selected': { fill: { t3: 'container/bg' }, stroke: { t3: 'component/outline-default' }, strokeWeight: 1,
+                        text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
+          'Focus':    { fill: 'default/component/bg-default', stroke: { t3: 'component/outline-default' }, strokeWeight: 2 },
+          'Disabled': { fill: 'default/component/bg-default', componentOpacity: 0.3 }
+        },
+        'Outlined': {
+          'Default':  { stroke: 'default/component/outline-default', strokeWeight: 1 },
+          'Hover':    { fill: 'default/component/bg-hover',   stroke: 'default/component/outline-default', strokeWeight: 1 },
+          'Pressed':  { fill: 'default/component/bg-pressed', stroke: 'default/component/outline-default', strokeWeight: 1 },
+          'Selected': { fill: { t3: 'container/bg' }, stroke: { t3: 'component/outline-default' }, strokeWeight: 1,
+                        text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
+          'Focus':    { stroke: { t3: 'component/outline-default' }, strokeWeight: 2 },
+          'Disabled': { stroke: 'default/component/outline-default', strokeWeight: 1, componentOpacity: 0.3 }
+        },
+        'Ghost': {
+          'Default':  {},
+          'Hover':    { fill: 'default/component/bg-hover' },
+          'Pressed':  { fill: 'default/component/bg-pressed' },
+          'Selected': { fill: { t3: 'container/bg' }, stroke: { t3: 'component/outline-default' }, strokeWeight: 1,
+                        text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
+          'Focus':    { stroke: { t3: 'component/outline-default' }, strokeWeight: 2 },
+          'Disabled': { componentOpacity: 0.3 }
+        },
+        'Fill & Outline': {
+          'Default':  { fill: 'default/component/bg-default', stroke: 'default/component/outline-default', strokeWeight: 1 },
+          'Hover':    { fill: 'default/component/bg-hover',   stroke: 'default/component/outline-default', strokeWeight: 1 },
+          'Pressed':  { fill: 'default/component/bg-pressed', stroke: 'default/component/outline-default', strokeWeight: 1 },
+          'Selected': { fill: { t3: 'container/bg' }, stroke: { t3: 'component/outline-default' }, strokeWeight: 1,
+                        text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
+          'Focus':    { fill: 'default/component/bg-default', stroke: { t3: 'component/outline-default' }, strokeWeight: 2 },
+          'Disabled': { fill: 'default/component/bg-default', stroke: 'default/component/outline-default', strokeWeight: 1, componentOpacity: 0.3 }
+        }
+      }
     },
-    'Outlined': {
-      'Default':          { stroke: 'default/component/outline', strokeWeight: 1 },
-      'Hover':            { fill: 'default/component/bg-hover', stroke: 'default/component/outline', strokeWeight: 1 },
-      'Pressed':          { fill: 'default/component/bg-pressed', stroke: 'default/component/outline', strokeWeight: 1 },
-      'Selected':         { fill: { t3: 'container/bg' }, stroke: { t3: 'component/outline-default' }, strokeWeight: 1,
-                            text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
-      'Focus':            { stroke: { t3: 'component/outline-default' }, strokeWeight: 2 },
-      'Disabled':         { stroke: 'default/component/outline', strokeWeight: 1, componentOpacity: 0.3 }
-    },
-    'Ghost': {
-      'Default':          {},
-      'Hover':            { fill: 'default/component/bg-hover' },
-      'Pressed':          { fill: 'default/component/bg-pressed' },
-      'Selected':         { fill: { t3: 'container/bg' }, stroke: { t3: 'component/outline-default' }, strokeWeight: 1,
-                            text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
-      'Focus':            { stroke: { t3: 'component/outline-default' }, strokeWeight: 2 },
-      'Disabled':         { componentOpacity: 0.3 }
-    },
-    'Fill & Outline': {
-      'Default':          { fill: 'default/component/bg', stroke: 'default/component/outline', strokeWeight: 1 },
-      'Hover':            { fill: 'default/component/bg-hover', stroke: 'default/component/outline', strokeWeight: 1 },
-      'Pressed':          { fill: 'default/component/bg-pressed', stroke: 'default/component/outline', strokeWeight: 1 },
-      'Selected':         { fill: { t3: 'container/bg' }, stroke: { t3: 'component/outline-default' }, strokeWeight: 1,
-                            text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
-      'Focus':            { fill: 'default/component/bg', stroke: { t3: 'component/outline-default' }, strokeWeight: 2 },
-      'Disabled':         { fill: 'default/component/bg', stroke: 'default/component/outline', strokeWeight: 1, componentOpacity: 0.3 }
+
+    /* ── BRAND FAMILY ──────────────────────────────────────────
+       4 semantic variants, all bound to T3 collection's 'brand' mode.
+       Maps to real-world button hierarchies:
+         Primary   = high-emphasis, brand-filled, white text       (Call-to-Action)
+         Secondary = brand outline, brand text                     (Confirm / next-tier action)
+         Tertiary  = tonal brand container fill, brand text         (Quiet emphasis)
+         Ghost     = no chrome, brand text                          (Inline / minimal)
+       Selected state intentionally omitted — toggle/selection isn't a brand-button concept.
+       ────────────────────────────────────────────────────────── */
+    'Brand': {
+      types:  ['Primary', 'Secondary', 'Tertiary', 'Ghost'],
+      states: ['Default', 'Hover', 'Pressed', 'Focus', 'Disabled'],
+      t3Mode: 'brand',
+      stateOverrides: {
+        'Primary': {
+          'Default':  { fill: { t3: 'component/bg-default' },
+                        text: { t3: 'oncomponent-content/default' }, icon: { t3: 'oncomponent-content/default' } },
+          'Hover':    { fill: { t3: 'component/bg-hover' },
+                        text: { t3: 'oncomponent-content/default' }, icon: { t3: 'oncomponent-content/default' } },
+          'Pressed':  { fill: { t3: 'component/bg-pressed' },
+                        text: { t3: 'oncomponent-content/default' }, icon: { t3: 'oncomponent-content/default' } },
+          'Focus':    { fill: { t3: 'component/bg-default' }, stroke: { t3: 'component/outline-default' }, strokeWeight: 2,
+                        text: { t3: 'oncomponent-content/default' }, icon: { t3: 'oncomponent-content/default' } },
+          'Disabled': { fill: { t3: 'component/bg-default' }, componentOpacity: 0.3,
+                        text: { t3: 'oncomponent-content/default' }, icon: { t3: 'oncomponent-content/default' } }
+        },
+        'Secondary': {
+          'Default':  { stroke: { t3: 'component/outline-default' }, strokeWeight: 1,
+                        text: { t3: 'content/default' }, icon: { t3: 'content/default' } },
+          'Hover':    { fill: { t3: 'container/bg' }, stroke: { t3: 'component/outline-hover' }, strokeWeight: 1,
+                        text: { t3: 'content/default' }, icon: { t3: 'content/default' } },
+          'Pressed':  { fill: { t3: 'container/hover' }, stroke: { t3: 'component/outline-pressed' }, strokeWeight: 1,
+                        text: { t3: 'content/default' }, icon: { t3: 'content/default' } },
+          'Focus':    { stroke: { t3: 'component/outline-default' }, strokeWeight: 2,
+                        text: { t3: 'content/default' }, icon: { t3: 'content/default' } },
+          'Disabled': { stroke: { t3: 'component/outline-default' }, strokeWeight: 1, componentOpacity: 0.3,
+                        text: { t3: 'content/default' }, icon: { t3: 'content/default' } }
+        },
+        'Tertiary': {
+          'Default':  { fill: { t3: 'container/bg' },
+                        text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
+          'Hover':    { fill: { t3: 'container/hover' },
+                        text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
+          'Pressed':  { fill: { t3: 'container/pressed' },
+                        text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
+          'Focus':    { fill: { t3: 'container/bg' }, stroke: { t3: 'container/outline' }, strokeWeight: 2,
+                        text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } },
+          'Disabled': { fill: { t3: 'container/bg' }, componentOpacity: 0.3,
+                        text: { t3: 'oncontainer-content/default' }, icon: { t3: 'oncontainer-content/default' } }
+        },
+        'Ghost': {
+          'Default':  { text: { t3: 'content/default' }, icon: { t3: 'content/default' } },
+          'Hover':    { fill: { t3: 'container/bg' },
+                        text: { t3: 'content/default' }, icon: { t3: 'content/default' } },
+          'Pressed':  { fill: { t3: 'container/hover' },
+                        text: { t3: 'content/default' }, icon: { t3: 'content/default' } },
+          'Focus':    { stroke: { t3: 'component/outline-default' }, strokeWeight: 2,
+                        text: { t3: 'content/default' }, icon: { t3: 'content/default' } },
+          'Disabled': { componentOpacity: 0.3,
+                        text: { t3: 'content/default' }, icon: { t3: 'content/default' } }
+        }
+      }
     }
   }
 };
@@ -1367,10 +1439,18 @@ async function generateComponentFromBlueprint(blueprint) {
   heroDivider.x = HERO_PAD; heroDivider.y = hy;
   hy += 16;
 
-  /* Stat badges */
+  /* Stat badges — aggregate counts across all families. */
+  var _famNames = Object.keys(BP.families || {});
+  var _totalTypes = 0, _totalStates = 0, _maxStates = 0;
+  for (var _fi = 0; _fi < _famNames.length; _fi++) {
+    var _f = BP.families[_famNames[_fi]];
+    _totalTypes += _f.types.length;
+    if (_f.states.length > _maxStates) _maxStates = _f.states.length;
+  }
+  _totalStates = _maxStates;
   var statBadges = [
     createBadge('Tier 1: ' + masterNames.length + ' Masters', COLOR_HERO_CARD, COLOR_HERO_SUB),
-    createBadge('Tier 2: ' + BP.types.length + ' Types \u00d7 ' + BP.states.length + ' States', COLOR_HERO_CARD, COLOR_HERO_SUB),
+    createBadge('Tier 2: ' + _famNames.length + ' Families \u00b7 ' + _totalTypes + ' Types \u00d7 up to ' + _totalStates + ' States', COLOR_HERO_CARD, COLOR_HERO_SUB),
     createBadge('Token-bound', COLOR_HERO_CARD, COLOR_SUCCESS)
   ];
   var bx = HERO_PAD;
@@ -1893,278 +1973,292 @@ async function generateComponentFromBlueprint(blueprint) {
   for (var mci = 0; mci < masterNames.length; mci++) {
     var mName = masterNames[mci];
     var masterComp = masterComponents[mName];
-    var setDisplayName = BP.name + ' / ' + mName;
 
-    var components = []; /* { component, type, state } */
+    /* Iterate FAMILIES (Neutral, Brand, …) — each produces its own component set. */
+    var familyNames = Object.keys(BP.families);
+    for (var famI = 0; famI < familyNames.length; famI++) {
+      var familyName = familyNames[famI];
+      var family = BP.families[familyName];
+      var famTypes = family.types;
+      var famStates = family.states;
+      var famOverrides = family.stateOverrides;
+      var famT3ModeId = (family.t3Mode && t3Modes[family.t3Mode]) ? t3Modes[family.t3Mode] : null;
 
-    for (var ti = 0; ti < BP.types.length; ti++) {
-      var typeName = BP.types[ti];
-      for (var sti = 0; sti < BP.states.length; sti++) {
-        var stateName = BP.states[sti];
-        var overrides = BP.stateOverrides[typeName][stateName];
-        if (!overrides) continue;
+      var setDisplayName = BP.name + ' / ' + familyName + ' / ' + mName;
 
-        /* Create variant component — thin wrapper, NO padding or layout of its own.
-           All structure comes from the master instance inside it. */
-        var varComp = figma.createComponent();
-        varComp.name = 'Type=' + typeName + ', State=' + stateName;
-        varComp.resize(120, 36);
-        varComp.layoutMode = 'HORIZONTAL';
-        varComp.counterAxisAlignItems = 'CENTER';
-        varComp.primaryAxisAlignItems = 'MIN';
-        varComp.layoutSizingHorizontal = 'HUG';
-        varComp.layoutSizingVertical = 'HUG';
-        varComp.fills = [];
-        varComp.clipsContent = false;
-        varComp.paddingLeft = 0;
-        varComp.paddingRight = 0;
-        varComp.paddingTop = 0;
-        varComp.paddingBottom = 0;
-        varComp.itemSpacing = 0;
+      var components = []; /* { component, type, state } */
 
-        /* Disabled opacity lives on the COMPONENT (not the instance) */
-        if (overrides.componentOpacity !== undefined) {
-          varComp.opacity = overrides.componentOpacity;
-        }
+      for (var ti = 0; ti < famTypes.length; ti++) {
+        var typeName = famTypes[ti];
+        for (var sti = 0; sti < famStates.length; sti++) {
+          var stateName = famStates[sti];
+          var overrides = famOverrides[typeName] && famOverrides[typeName][stateName];
+          if (!overrides) continue;
 
-        /* Create instance of master component */
-        var instance = masterComp.createInstance();
-        varComp.appendChild(instance);
-        instance.layoutSizingHorizontal = 'HUG';
-        instance.layoutSizingVertical = 'FIXED';
+          /* Create variant component — thin wrapper, NO padding or layout of its own.
+             All structure comes from the master instance inside it. */
+          var varComp = figma.createComponent();
+          varComp.name = 'Type=' + typeName + ', State=' + stateName;
+          varComp.resize(120, 36);
+          varComp.layoutMode = 'HORIZONTAL';
+          varComp.counterAxisAlignItems = 'CENTER';
+          varComp.primaryAxisAlignItems = 'MIN';
+          varComp.layoutSizingHorizontal = 'HUG';
+          varComp.layoutSizingVertical = 'HUG';
+          varComp.fills = [];
+          varComp.clipsContent = false;
+          varComp.paddingLeft = 0;
+          varComp.paddingRight = 0;
+          varComp.paddingTop = 0;
+          varComp.paddingBottom = 0;
+          varComp.itemSpacing = 0;
 
-        /* ── Apply color overrides on the INSTANCE ── */
-
-        /* Fill override */
-        if (overrides.fill) {
-          var fillVar = resolveColorSpec(overrides.fill, t2Vars, t3Vars);
-          if (fillVar) {
-            setPaintBoundToVariable(instance, 'fills', fillVar);
-            stats.bindings++;
+          /* Lock T3 mode for brand/semantic families so all { t3: … } bindings
+             resolve to the family's status palette. */
+          if (famT3ModeId && t3Col) {
+            try { varComp.setExplicitVariableModeForCollection(t3Col, famT3ModeId); }
+            catch (e) { log('T3 mode lock failed (' + familyName + '): ' + e.message); }
           }
-        } else {
-          instance.fills = [];
-        }
 
-        /* Stroke override */
-        if (overrides.stroke) {
-          var strokeVar = resolveColorSpec(overrides.stroke, t2Vars, t3Vars);
-          if (strokeVar) {
-            setPaintBoundToVariable(instance, 'strokes', strokeVar);
-            instance.strokeWeight = overrides.strokeWeight || 1;
-            instance.strokeAlign = 'INSIDE';
-            stats.bindings++;
+          /* Disabled opacity lives on the COMPONENT (not the instance) */
+          if (overrides.componentOpacity !== undefined) {
+            varComp.opacity = overrides.componentOpacity;
           }
-        } else {
-          instance.strokes = [];
-        }
 
-        /* Text/icon color overrides (only when different from master default) */
-        if (overrides.text) {
-          var textColorVar = resolveColorSpec(overrides.text, t2Vars, t3Vars);
-          if (textColorVar) {
-            var textChildren = instance.findAll(function(n) { return n.type === 'TEXT'; });
-            for (var tci = 0; tci < textChildren.length; tci++) {
-              setPaintBoundToVariable(textChildren[tci], 'fills', textColorVar);
+          /* Create instance of master component */
+          var instance = masterComp.createInstance();
+          varComp.appendChild(instance);
+          instance.layoutSizingHorizontal = 'HUG';
+          instance.layoutSizingVertical = 'FIXED';
+
+          /* ── Apply color overrides on the INSTANCE ── */
+
+          /* Fill override */
+          if (overrides.fill) {
+            var fillVar = resolveColorSpec(overrides.fill, t2Vars, t3Vars);
+            if (fillVar) {
+              setPaintBoundToVariable(instance, 'fills', fillVar);
               stats.bindings++;
+            }
+          } else {
+            instance.fills = [];
+          }
+
+          /* Stroke override */
+          if (overrides.stroke) {
+            var strokeVar = resolveColorSpec(overrides.stroke, t2Vars, t3Vars);
+            if (strokeVar) {
+              setPaintBoundToVariable(instance, 'strokes', strokeVar);
+              instance.strokeWeight = overrides.strokeWeight || 1;
+              instance.strokeAlign = 'INSIDE';
+              stats.bindings++;
+            }
+          } else {
+            instance.strokes = [];
+          }
+
+          /* Text/icon color overrides (only when different from master default) */
+          if (overrides.text) {
+            var textColorVar = resolveColorSpec(overrides.text, t2Vars, t3Vars);
+            if (textColorVar) {
+              var textChildren = instance.findAll(function(n) { return n.type === 'TEXT'; });
+              for (var tci = 0; tci < textChildren.length; tci++) {
+                setPaintBoundToVariable(textChildren[tci], 'fills', textColorVar);
+                stats.bindings++;
+              }
+            }
+          }
+
+          if (overrides.icon) {
+            var iconColorVar = resolveColorSpec(overrides.icon, t2Vars, t3Vars);
+            if (iconColorVar) {
+              var iconChildren = instance.findAll(function(n) { return n.name === 'Vector'; });
+              for (var ici = 0; ici < iconChildren.length; ici++) {
+                setPaintBoundToVariable(iconChildren[ici], 'fills', iconColorVar);
+                stats.bindings++;
+              }
+            }
+          }
+
+          components.push({ component: varComp, type: typeName, state: stateName });
+          stats.components++;
+        }
+      }
+
+      /* ── Combine into ComponentSet ── */
+      figma.ui.postMessage({ type: 'gen-progress', text: 'Combining ' + setDisplayName + '…' });
+
+      var allComps = [];
+      for (var ai = 0; ai < components.length; ai++) {
+        allComps.push(components[ai].component);
+      }
+      var componentSet = figma.combineAsVariants(allComps, page);
+      componentSet.name = setDisplayName;
+      componentSet.description = (BP.description || '') + ' Family: ' + familyName + '.';
+
+      /* Grid layout: types as rows, states as columns. */
+      var colCount = famStates.length;
+      var rowCount = famTypes.length;
+      var padX = 20;
+      var padY = 27;
+      var colSpacing = 155;
+      var rowSpacing = 70;
+      for (var gi = 0; gi < components.length; gi++) {
+        var row = Math.floor(gi / colCount);
+        var col = gi % colCount;
+        components[gi].component.x = padX + col * colSpacing;
+        components[gi].component.y = padY + row * rowSpacing;
+      }
+      var totalW = padX * 2 + (colCount - 1) * colSpacing + 120;
+      var totalH = padY + (rowCount - 1) * rowSpacing + 32 + padY;
+      try { componentSet.resize(totalW, totalH); } catch (e) { /* auto-size */ }
+
+      /* ── Row/column label constants ── */
+      var ROW_LABEL_WIDTH = 100;
+      var COL_HEADER_HEIGHT = 40;
+
+      /* ── Step 7: Component properties propagated from master ── */
+      figma.ui.postMessage({ type: 'gen-progress', text: 'Properties propagated from masters…' });
+
+      /* ── Step 8: Wire interactive reactions ── */
+      figma.ui.postMessage({ type: 'gen-progress', text: 'Wiring interactions for ' + familyName + '…' });
+
+      for (var ri = 0; ri < famTypes.length; ri++) {
+        var rType = famTypes[ri];
+        var defaultComp = null, hoverComp = null, pressedComp = null;
+
+        for (var rj = 0; rj < components.length; rj++) {
+          if (components[rj].type !== rType) continue;
+          if (components[rj].state === 'Default') defaultComp = components[rj].component;
+          if (components[rj].state === 'Hover')   hoverComp = components[rj].component;
+          if (components[rj].state === 'Pressed') pressedComp = components[rj].component;
+        }
+
+        if (defaultComp) {
+          var reactions = [];
+          if (hoverComp) {
+            reactions.push({
+              trigger: { type: 'ON_HOVER' },
+              actions: [{
+                type: 'NODE',
+                destinationId: hoverComp.id,
+                navigation: 'CHANGE_TO',
+                transition: { type: 'DISSOLVE', duration: 0.15, easing: { type: 'EASE_IN_AND_OUT' } }
+              }]
+            });
+            stats.reactions++;
+          }
+          if (pressedComp) {
+            reactions.push({
+              trigger: { type: 'ON_PRESS' },
+              actions: [{
+                type: 'NODE',
+                destinationId: pressedComp.id,
+                navigation: 'CHANGE_TO',
+                transition: { type: 'DISSOLVE', duration: 0.05, easing: { type: 'EASE_IN_AND_OUT' } }
+              }]
+            });
+            stats.reactions++;
+          }
+          if (reactions.length > 0) {
+            try {
+              await defaultComp.setReactionsAsync(reactions);
+            } catch (re) {
+              log('Reaction wiring failed for ' + familyName + '/' + rType + ': ' + re.message);
+              stats.errors.push('Reactions ' + familyName + '/' + rType + ': ' + re.message);
             }
           }
         }
-
-        if (overrides.icon) {
-          var iconColorVar = resolveColorSpec(overrides.icon, t2Vars, t3Vars);
-          if (iconColorVar) {
-            var iconChildren = instance.findAll(function(n) { return n.name === 'Vector'; });
-            for (var ici = 0; ici < iconChildren.length; ici++) {
-              setPaintBoundToVariable(iconChildren[ici], 'fills', iconColorVar);
-              stats.bindings++;
-            }
-          }
-        }
-
-        components.push({ component: varComp, type: typeName, state: stateName });
-        stats.components++;
-      }
-    }
-
-    /* ── Combine into ComponentSet ── */
-    figma.ui.postMessage({ type: 'gen-progress', text: 'Combining ' + setDisplayName + '…' });
-
-    var allComps = [];
-    for (var ai = 0; ai < components.length; ai++) {
-      allComps.push(components[ai].component);
-    }
-    var componentSet = figma.combineAsVariants(allComps, page);
-    componentSet.name = setDisplayName;
-    componentSet.description = BP.description || '';
-
-    /* Grid layout: types as rows, states as columns.
-       Row/column labels positioned outside the component set. */
-    var colCount = BP.states.length;
-    var rowCount = BP.types.length;
-    var padX = 20;
-    var padY = 27;
-    var colSpacing = 155;
-    var rowSpacing = 70;
-    for (var gi = 0; gi < components.length; gi++) {
-      var row = Math.floor(gi / colCount);
-      var col = gi % colCount;
-      components[gi].component.x = padX + col * colSpacing;
-      components[gi].component.y = padY + row * rowSpacing;
-    }
-    var totalW = padX * 2 + (colCount - 1) * colSpacing + 120;
-    var totalH = padY + (rowCount - 1) * rowSpacing + 32 + padY;
-    try { componentSet.resize(totalW, totalH); } catch (e) { /* auto-size */ }
-
-    /* ── Row/column label constants ── */
-    var ROW_LABEL_WIDTH = 100;
-    var COL_HEADER_HEIGHT = 40;
-
-    /* ── Step 7: Component properties ──
-       TEXT and INSTANCE_SWAP are already wired on the MASTER component.
-       They propagate through instances automatically.
-       No additional wiring needed at the component set level. */
-    figma.ui.postMessage({ type: 'gen-progress', text: 'Properties propagated from masters…' });
-
-    /* ── Step 8: Wire interactive reactions ── */
-    figma.ui.postMessage({ type: 'gen-progress', text: 'Wiring interactions…' });
-
-    for (var ri = 0; ri < BP.types.length; ri++) {
-      var rType = BP.types[ri];
-      var defaultComp = null, hoverComp = null, pressedComp = null;
-
-      for (var rj = 0; rj < components.length; rj++) {
-        if (components[rj].type !== rType) continue;
-        if (components[rj].state === 'Default') defaultComp = components[rj].component;
-        if (components[rj].state === 'Hover')   hoverComp = components[rj].component;
-        if (components[rj].state === 'Pressed') pressedComp = components[rj].component;
       }
 
-      if (defaultComp) {
-        var reactions = [];
-        if (hoverComp) {
-          reactions.push({
-            trigger: { type: 'ON_HOVER' },
-            actions: [{
-              type: 'NODE',
-              destinationId: hoverComp.id,
-              navigation: 'CHANGE_TO',
-              transition: { type: 'DISSOLVE', duration: 0.15, easing: { type: 'EASE_IN_AND_OUT' } }
-            }]
-          });
-          stats.reactions++;
-        }
-        if (pressedComp) {
-          reactions.push({
-            trigger: { type: 'ON_PRESS' },
-            actions: [{
-              type: 'NODE',
-              destinationId: pressedComp.id,
-              navigation: 'CHANGE_TO',
-              transition: { type: 'DISSOLVE', duration: 0.05, easing: { type: 'EASE_IN_AND_OUT' } }
-            }]
-          });
-          stats.reactions++;
-        }
-        if (reactions.length > 0) {
-          try {
-            await defaultComp.setReactionsAsync(reactions);
-          } catch (re) {
-            log('Reaction wiring failed for ' + rType + ': ' + re.message);
-            stats.errors.push('Reactions ' + rType + ': ' + re.message);
-          }
-        }
+      allComponentSets.push(componentSet);
+
+      /* ── Position inside variant section with styled labels ── */
+
+      /* Sub-heading card for this family + master combo */
+      var setHeadingCard = createCard({
+        name: 'heading-' + familyName + '-' + mName,
+        fill: COLOR_HEADER_BG,
+        radius: 10,
+        padX: 20,
+        padY: 12,
+        gap: 0,
+        direction: 'HORIZONTAL'
+      });
+      setHeadingCard.counterAxisAlignItems = 'CENTER';
+      setHeadingCard.itemSpacing = 12;
+      setHeadingCard.appendChild(createLabel(familyName + ' · ' + mName, 14, true, COLOR_HEADING));
+      var slotBadge = createBadge(BP.masters[mName].slots.join(' + '), COLOR_CM_BG, COLOR_DIMMED);
+      setHeadingCard.appendChild(slotBadge);
+      variantSec.section.appendChild(setHeadingCard);
+      setHeadingCard.x = variantSec.innerX;
+      setHeadingCard.y = varSecContentY;
+      varSecContentY += setHeadingCard.height + 20;
+
+      /* Bind sub-heading to surface tokens */
+      if (t2Col && brightModeId) {
+        try {
+          setHeadingCard.setExplicitVariableModeForCollection(t2Col, brightModeId);
+          tryBindFill(setHeadingCard, t2Vars['default/surfaces/strong']);
+          if (setHeadingCard.children.length > 0) tryBindFill(setHeadingCard.children[0], t2Vars['default/content/strong']);
+          tryBindFill(slotBadge, t2Vars['default/component/bg-default']);
+          if (slotBadge.children.length > 0) tryBindFill(slotBadge.children[0], t2Vars['default/content/subtle']);
+        } catch (e) {}
       }
-    }
 
-    allComponentSets.push(componentSet);
+      /* Component set X offset (leave room for row labels) */
+      var csX = variantSec.innerX + ROW_LABEL_WIDTH;
+      var csY = varSecContentY + COL_HEADER_HEIGHT;
 
-    /* ── Position inside variant section with styled labels ── */
+      /* Column header bar */
+      var colHeaderBar = figma.createFrame();
+      colHeaderBar.name = 'col-headers-' + familyName + '-' + mName;
+      colHeaderBar.resize(totalW, 34);
+      colHeaderBar.cornerRadius = 8;
+      colHeaderBar.fills = [{ type: 'SOLID', color: COLOR_HEADER_BG }];
+      colHeaderBar.clipsContent = false;
 
-    /* Sub-heading card for this master type */
-    var setHeadingCard = createCard({
-      name: 'heading-' + mName,
-      fill: COLOR_HEADER_BG,
-      radius: 10,
-      padX: 20,
-      padY: 12,
-      gap: 0,
-      direction: 'HORIZONTAL'
-    });
-    setHeadingCard.counterAxisAlignItems = 'CENTER';
-    setHeadingCard.itemSpacing = 12;
-    setHeadingCard.appendChild(createLabel(mName, 14, true, COLOR_HEADING));
-    var slotBadge = createBadge(BP.masters[mName].slots.join(' + '), COLOR_CM_BG, COLOR_DIMMED);
-    setHeadingCard.appendChild(slotBadge);
-    variantSec.section.appendChild(setHeadingCard);
-    setHeadingCard.x = variantSec.innerX;
-    setHeadingCard.y = varSecContentY;
-    varSecContentY += setHeadingCard.height + 20;
+      for (var chi = 0; chi < famStates.length; chi++) {
+        var colH = createLabel(famStates[chi], 11, true, COLOR_DIMMED);
+        colHeaderBar.appendChild(colH);
+        colH.x = padX + chi * colSpacing;
+        colH.y = 10;
+        tryBindFill(colH, t2Vars['default/content/subtle']);
+      }
+      variantSec.section.appendChild(colHeaderBar);
+      colHeaderBar.x = csX;
+      colHeaderBar.y = varSecContentY;
+      tryBindFill(colHeaderBar, t2Vars['default/surfaces/strong']);
 
-    /* Bind sub-heading to surface tokens */
-    if (t2Col && brightModeId) {
-      try {
-        setHeadingCard.setExplicitVariableModeForCollection(t2Col, brightModeId);
-        tryBindFill(setHeadingCard, t2Vars['default/surfaces/strong']);
-        if (setHeadingCard.children.length > 0) tryBindFill(setHeadingCard.children[0], t2Vars['default/content/strong']);
-        tryBindFill(slotBadge, t2Vars['default/component/bg']);
-        if (slotBadge.children.length > 0) tryBindFill(slotBadge.children[0], t2Vars['default/content/subtle']);
-      } catch (e) {}
-    }
+      /* Row labels */
+      for (var rhi = 0; rhi < famTypes.length; rhi++) {
+        var rowLabel = createLabel(famTypes[rhi], 11, false, COLOR_BODY);
+        variantSec.section.appendChild(rowLabel);
+        rowLabel.x = variantSec.innerX + 4;
+        rowLabel.y = csY + padY + rhi * rowSpacing + 8;
+        tryBindFill(rowLabel, t2Vars['default/content/default']);
+      }
 
-    /* Component set X offset (leave room for row labels) */
-    var csX = variantSec.innerX + ROW_LABEL_WIDTH;
-    var csY = varSecContentY + COL_HEADER_HEIGHT;
+      /* Place the component set */
+      variantSec.section.appendChild(componentSet);
+      componentSet.x = csX;
+      componentSet.y = csY;
+      varSecContentY = csY + totalH + 40;
 
-    /* Column header bar — plain frame, positioned text nodes */
-    var colHeaderBar = figma.createFrame();
-    colHeaderBar.name = 'col-headers-' + mName;
-    colHeaderBar.resize(totalW, 34);
-    colHeaderBar.cornerRadius = 8;
-    colHeaderBar.fills = [{ type: 'SOLID', color: COLOR_HEADER_BG }];
-    colHeaderBar.clipsContent = false;
+      /* Separator line between groups (except very last family of last master) */
+      var isLastFamily = (famI === familyNames.length - 1);
+      var isLastMaster = (mci === masterNames.length - 1);
+      if (!(isLastFamily && isLastMaster)) {
+        var groupDiv = createDivider(SECTION_W - 80);
+        variantSec.section.appendChild(groupDiv);
+        groupDiv.x = variantSec.innerX;
+        groupDiv.y = varSecContentY;
+        tryBindFill(groupDiv, t2Vars['default/surfaces/separator']);
+        varSecContentY += 24;
+      }
 
-    for (var chi = 0; chi < BP.states.length; chi++) {
-      var colH = createLabel(BP.states[chi], 11, true, COLOR_DIMMED);
-      colHeaderBar.appendChild(colH);
-      colH.x = padX + chi * colSpacing;
-      colH.y = 10;
-      /* Bind col header text */
-      tryBindFill(colH, t2Vars['default/content/subtle']);
-    }
-    variantSec.section.appendChild(colHeaderBar);
-    colHeaderBar.x = csX;
-    colHeaderBar.y = varSecContentY;
-    /* Bind col header bar bg */
-    tryBindFill(colHeaderBar, t2Vars['default/surfaces/strong']);
-
-    /* Row labels — simple text nodes */
-    for (var rhi = 0; rhi < BP.types.length; rhi++) {
-      var rowLabel = createLabel(BP.types[rhi], 11, false, COLOR_BODY);
-      variantSec.section.appendChild(rowLabel);
-      rowLabel.x = variantSec.innerX + 4;
-      rowLabel.y = csY + padY + rhi * rowSpacing + 8;
-      /* Bind row label text */
-      tryBindFill(rowLabel, t2Vars['default/content/default']);
-    }
-
-    /* Place the component set */
-    variantSec.section.appendChild(componentSet);
-    componentSet.x = csX;
-    componentSet.y = csY;
-    varSecContentY = csY + totalH + 40;
-
-    /* Separator line between variant groups (except last) */
-    if (mci < masterNames.length - 1) {
-      var groupDiv = createDivider(SECTION_W - 80);
-      variantSec.section.appendChild(groupDiv);
-      groupDiv.x = variantSec.innerX;
-      groupDiv.y = varSecContentY;
-      tryBindFill(groupDiv, t2Vars['default/surfaces/separator']);
-      varSecContentY += 24;
-    }
-
-    log('Created component set: ' + setDisplayName + ' (' + components.length + ' variants)');
+      log('Created component set: ' + setDisplayName + ' (' + components.length + ' variants)');
+    } /* end families loop */
   }
 
   /* Finalize variant section size and append to page */
@@ -2185,8 +2279,9 @@ async function generateComponentFromBlueprint(blueprint) {
     nodeIds: allComponentSets.map(function(cs) { return cs.id; }),
     masterFrameId: masterFrame.id,
     generatedAt: new Date().toISOString(),
-    types: BP.types.length,
-    states: BP.states.length,
+    families: Object.keys(BP.families || {}),
+    types: (function(){ var n=0; var ks=Object.keys(BP.families||{}); for (var i=0;i<ks.length;i++) n += BP.families[ks[i]].types.length; return n; })(),
+    states: (function(){ var m=0; var ks=Object.keys(BP.families||{}); for (var i=0;i<ks.length;i++) if (BP.families[ks[i]].states.length>m) m=BP.families[ks[i]].states.length; return m; })(),
     totalComponents: stats.components,
     architecture: 'two-tier-master-instance'
   };
