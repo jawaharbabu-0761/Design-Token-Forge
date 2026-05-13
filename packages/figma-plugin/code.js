@@ -674,6 +674,7 @@ async function tryBindVar(node, field, variable) {
 
 var BUTTON_BLUEPRINT = {
   name: 'Button',
+  description: 'A multi-purpose button supporting 4 structures (Fill, Outlined, Ghost, Fill & Outline), 10 density sizes, icon + text slots, and full state coverage. Uses comp-size variables for spacing and T2/T3 context tokens for color.',
 
   /* Master component layouts (TIER 1)
      Each master defines: slots, rootPAlign, and slot-specific overrides.
@@ -1598,6 +1599,7 @@ async function generateComponentFromBlueprint(blueprint) {
     /* Create master component */
     var master = figma.createComponent();
     master.name = masterName;
+    master.description = BP.description || '';
     master.resize(120, 32);
     master.layoutMode = 'HORIZONTAL';
     master.counterAxisAlignItems = 'CENTER';
@@ -1712,6 +1714,7 @@ async function generateComponentFromBlueprint(blueprint) {
         textNode.textAlignHorizontal = 'LEFT';
         textNode.textAlignVertical = 'CENTER';
         textNode.textAutoResize = 'WIDTH_AND_HEIGHT';
+        textNode.leadingTrim = 'CAP_HEIGHT';
         textNode.layoutAlign = 'INHERIT';
 
         /* Content color on text */
@@ -1983,6 +1986,7 @@ async function generateComponentFromBlueprint(blueprint) {
     }
     var componentSet = figma.combineAsVariants(allComps, page);
     componentSet.name = setDisplayName;
+    componentSet.description = BP.description || '';
 
     /* Grid layout: types as rows, states as columns.
        Row/column labels positioned outside the component set. */
