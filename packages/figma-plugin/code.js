@@ -1792,17 +1792,17 @@ async function generateComponentFromBlueprint(blueprint) {
     master.x = mi * 240;
     master.y = 0;
 
-    /* Simple label for this master (no preview cards) */
+    /* Simple label for this master — positioned directly above it */
     var masterLabel = createLabel(masterName, 13, true, COLOR_HEADING);
     masterSec.section.appendChild(masterLabel);
-    masterLabel.x = masterSec.innerX;
-    masterLabel.y = masterSec.innerY + mHeaderBar.height + 24 + mi * 28;
+    masterLabel.x = masterSec.innerX + mi * 240;
+    masterLabel.y = masterSec.innerY + mHeaderBar.height + 24;
     tryBindFill(masterLabel, t2Vars['default/content/strong']);
 
     var masterSlotBadge = createBadge(masterCfg.slots.join(' + '), COLOR_CM_BG, COLOR_DIMMED);
     masterSec.section.appendChild(masterSlotBadge);
-    masterSlotBadge.x = masterSec.innerX + masterLabel.width + 12;
-    masterSlotBadge.y = masterSec.innerY + mHeaderBar.height + 22 + mi * 28;
+    masterSlotBadge.x = masterSec.innerX + mi * 240 + masterLabel.width + 12;
+    masterSlotBadge.y = masterSec.innerY + mHeaderBar.height + 22;
     tryBindFill(masterSlotBadge, t2Vars['default/component/bg']);
     if (masterSlotBadge.children.length > 0) tryBindFill(masterSlotBadge.children[0], t2Vars['default/content/subtle']);
 
@@ -1821,8 +1821,8 @@ async function generateComponentFromBlueprint(blueprint) {
   }
   try { masterFrame.resize(mfMaxX + 40, mfMaxY + 20); } catch (e) {}
 
-  /* Place master frame in section (below header + labels) */
-  var masterFrameY = masterSec.innerY + mHeaderBar.height + 24 + masterNames.length * 28 + 16;
+  /* Place master frame in section (below header + single label row) */
+  var masterFrameY = masterSec.innerY + mHeaderBar.height + 24 + 28 + 16;
   masterSec.section.appendChild(masterFrame);
   masterFrame.x = masterSec.innerX;
   masterFrame.y = masterFrameY;
